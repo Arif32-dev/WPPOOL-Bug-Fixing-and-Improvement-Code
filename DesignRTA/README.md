@@ -24,3 +24,7 @@ upstream plugin bug fixed at class-up-comments.php at line 266 - 268 comment thi
 
 upstream plugin bug fixed at class-up-comments.php at line 238 comment this code 
 || !isset($_POST['nonce'])
+
+
+
+Inside upstream plugin I have added a new line of code at class-up-comments.php at line 315  $response['comment_id'] = $comment->id;
