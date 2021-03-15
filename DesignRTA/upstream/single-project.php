@@ -138,7 +138,7 @@ while (have_posts()) : the_post(); ?>
                                                 </h5>
                                                 <?php $status = upstream_project_status_color($id); ?>
                                                 <?php if (!empty($status['status'])) : ?>
-                                                    <span class="label up-o-s-label" style="background-color: <?php echo esc_attr($status['color']); ?>"><?php echo $status['status']; ?></span>
+                                                    <span class="label up-o-s-label" style="background-color: <?php echo esc_attr($status['color']); ?>"><?php echo project_status_based_on_user($status['status']); ?></span>
                                                 <?php endif; ?>
                                             </div>
                                             <ul class="breadcrumb">
@@ -659,9 +659,6 @@ include_once 'global/footer.php';
 
                 let attachment = file_frame.state().get('selection').first();
 
-                let revision_count = $(e.currentTarget).parent().find('.revision_file_count').text()
-
-
                 let attachment_obj = {
 
                     attachment_id: attachment.id,
@@ -674,6 +671,24 @@ include_once 'global/footer.php';
                     file_id: $(e.currentTarget).attr('data-file_id'),
 
                 }
+
+                if (<?php echo json_encode(wp_get_current_user()->roles) ?>[0] == 'upstream_manager') {
+                    if (confirm("Ready For Approval ?")) {
+                        attachment_obj['ready_for_approval'] = true;
+                        save_discussion_revison_file(attachment_obj, e)
+                    } else {
+                        save_discussion_revison_file(attachment_obj, e)
+                    }
+                } else {
+                    save_discussion_revison_file(attachment_obj, e)
+                }
+
+            }
+
+            function save_discussion_revison_file(attachment_obj, e) {
+
+                let revision_count = $(e.currentTarget).parent().find('.revision_file_count').text()
+
                 $.ajax({
                     type: "post",
                     url: "<?php echo admin_url('admin-ajax.php') ?>",
@@ -682,8 +697,9 @@ include_once 'global/footer.php';
                         attachment_obj: attachment_obj
                     },
                     success: function(response) {
+                        console.log(response)
+                        if (!response) return;
                         let res = JSON.parse(response)
-                        console.log(res)
                         if (res.response == 'invalid_action') {
                             alert('Action is invalid')
                         }
@@ -711,7 +727,6 @@ include_once 'global/footer.php';
                     }
                 });
             }
-
 
             /* get revison files */
 

@@ -306,7 +306,7 @@ if (!empty($ordering)) {
 
                                         <?php //do_action('upstream_project_project_top_right'); 
                                         ?>
-                                        <a href="/add-project/"><i id="upstream_new_project_icon" class="fas fa-plus-circle fa-7x "></i></a>
+                                        <a href="<?php echo site_url('/add-project') ?>"><i id="upstream_new_project_icon" class="fas fa-plus-circle fa-7x "></i></a>
                                     </div>
                                 </div>
                                 <div class="card-footer bg-success text-white">
@@ -399,7 +399,8 @@ if (!empty($ordering)) {
                 <div class="col-lg-5 col-md-12">
                     <!-- page statustic card start -->
                     <div class="row">
-                        <div class="col-sm-6">
+
+                        <div class="col-sm-6 col-6">
                             <div class="card">
                                 <div class="card-body">
                                     <div class="row align-items-center">
@@ -418,7 +419,8 @@ if (!empty($ordering)) {
                                             <h6 class="text-muted m-b-0">In Progress</h6>
                                         </div>
                                         <div class="col-4 text-right">
-                                            <i class="feather icon-bar-chart-2 f-28"></i>
+                                            <!-- <i class="feather icon-bar-chart-2 f-28"></i> -->
+                                            <i class="fas fa-drafting-compass f-28"></i>
                                         </div>
                                     </div>
                                 </div>
@@ -434,7 +436,8 @@ if (!empty($ordering)) {
                                 </div>
                             </div>
                         </div>
-                        <div class="col-sm-6">
+
+                        <div class="col-sm-6 col-6">
                             <div class="card">
                                 <div class="card-body">
                                     <div class="row align-items-center">
@@ -453,7 +456,8 @@ if (!empty($ordering)) {
                                             <h6 class="text-muted m-b-0">Completed</h6>
                                         </div>
                                         <div class="col-4 text-right">
-                                            <i class="feather icon-file-text f-28"></i>
+                                            <!-- <i class="feather icon-file-text f-28"></i> -->
+                                            <i class="fas fa-check f-28"></i>
                                         </div>
                                     </div>
                                 </div>
@@ -469,7 +473,8 @@ if (!empty($ordering)) {
                                 </div>
                             </div>
                         </div>
-                        <div class="col-sm-6">
+
+                        <div class="col-sm-6 col-6">
                             <div class="card">
                                 <div class="card-body">
                                     <div class="row align-items-center">
@@ -488,7 +493,8 @@ if (!empty($ordering)) {
                                             <h6 class="text-muted m-b-0">In Revision</h6>
                                         </div>
                                         <div class="col-4 text-right">
-                                            <i class="feather icon-calendar f-28"></i>
+                                            <!-- <i class="feather icon-calendar f-28"></i> -->
+                                            <i class="fas fa-history f-28"></i>
                                         </div>
                                     </div>
                                 </div>
@@ -504,7 +510,8 @@ if (!empty($ordering)) {
                                 </div>
                             </div>
                         </div>
-                        <div class="col-sm-6">
+
+                        <div class="col-sm-6 col-6">
                             <div class="card">
                                 <div class="card-body">
                                     <div class="row align-items-center">
@@ -522,7 +529,8 @@ if (!empty($ordering)) {
                                             <h6 class="text-muted m-b-0">Need Approval</h6>
                                         </div>
                                         <div class="col-4 text-right">
-                                            <i class="feather icon-thumbs-down f-28"></i>
+                                            <!-- <i class="feather icon-thumbs-down f-28"></i> -->
+                                            <i class="fas fa-exclamation f-28"></i>
                                         </div>
                                     </div>
                                 </div>
@@ -538,6 +546,7 @@ if (!empty($ordering)) {
                                 </div>
                             </div>
                         </div>
+
                     </div>
                     <!-- page statustic card end -->
                 </div>
@@ -561,7 +570,7 @@ if (!empty($ordering)) {
                                             <th>Start Date</th>
                                             <th>Delivery ETA</th>
                                             <th>Last Status Update</th>
-                                            <th class="text-right">Status</th>
+                                            <th class="text-center">Status</th>
 
                                         </tr>
                                     </thead>
@@ -732,7 +741,7 @@ if (!empty($ordering)) {
 
                                                     <td data-column="status" data-value="<?php echo !empty($status['id']) ? esc_attr($status['id']) : '__none__'; ?>" data-order="<?php echo $statusOrder > 0 ? $statusOrder : '0'; ?>">
                                                         <?php if ($project->status !== null || empty($status['id']) || empty($status['name'])) : ?>
-                                                            <span class="label up-o-label" style="background-color: <?php echo esc_attr($status['color']); ?>;"><?php echo !empty($status['name']) ? esc_html($status['name']) : esc_html($i18n['LB_NONE']); ?></span>
+                                                            <span class="label up-o-label" style="background-color: <?php echo esc_attr($status['color']); ?>;"><?php echo !empty($status['name']) ? project_status_based_on_user($status['name']) : esc_html($i18n['LB_NONE']); ?></span>
                                                         <?php else : ?>
                                                             <i class="s-text-color-gray"><?php echo esc_html($i18n['LB_NONE']); ?></i>
                                                         <?php endif; ?>

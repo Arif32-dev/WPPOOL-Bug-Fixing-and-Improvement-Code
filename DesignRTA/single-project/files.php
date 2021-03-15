@@ -284,6 +284,9 @@ if (
                                 attachment_data.file_id = data.file_id;
 
                                 add_revison_file_in_reply(attachment_data)
+                            } else {
+                                alert('Comment Added Successfully')
+                                location.reload()
                             }
                         }
                     }

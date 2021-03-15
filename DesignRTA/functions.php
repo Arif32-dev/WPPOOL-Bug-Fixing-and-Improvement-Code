@@ -1,4 +1,64 @@
 <?php
+// change project status waiting to complete
+// change project status waiting to complete
+function custom_update_post() {
+
+    $post_id = $_POST['post_id'];
+    update_post_meta($post_id, '_upstream_project_status', 'azp39');
+    // $post = array(
+    //     'post_modified'  => date(),
+    //     'post_modified_gmt'   => date(),
+    //     'ID'          => $post_id, // $post->ID;
+    // );
+    // // update post
+    // wp_update_post($post);
+
+
+    $project_title = get_the_title($post_id);
+    $current_user_id = get_current_user_id();
+    $user_meta = get_userdata($current_user_id);
+    $project_client_data = get_user_by('id', $current_user_id);
+
+    // send an email for client
+    $client_id = get_post_meta($post_id, '_upstream_project_manager', true);
+    $manager_data = get_users(['role__in' => ['upstream_manager']]);
+    $manager_email[] = '';
+    $manager_number[] = '0000000000';
+    foreach ($manager_data as $manager) {
+        $managerId = $manager->ID;
+        $manager_data = get_user_by('id', $managerId);
+        $manager_email[] = $manager_data->user_email;
+        $manager_number[] = $manager_data->phone_number;
+    }
+    $magnager_emails = implode(", ", $manager_email);
+    $manager_numbers = implode(", ", $manager_number);
+
+    $user_data = get_user_by('id', $client_id[0]);
+
+    if (function_exists('twl_send_sms')) {
+        $args = array(
+            'number_to' => $manager_numbers,
+            'message' => $project_title . " is approved",
+        );
+        twl_send_sms($args);
+    }
+
+
+    $to = $magnager_emails;
+    $subject = $project_title . " is approved";
+    $body = 'Your Project is approved by client Email=' . $project_client_data->user_email;
+    //$headers = array('Content-Type: text/html; charset=UTF-8', 'From: DesignRTA &lt;requests@designrta.com');
+    $headers[] = 'Content-Type: text/html; charset=UTF-8';
+    $headers = "From: DesignRTA <$user_data->user_email>" . "\r\n";
+
+    wp_mail($to, $subject, $body, $headers);
+
+    wp_die();
+}
+
+add_action('wp_ajax_custom_update_post', 'custom_update_post');
+add_action('wp_ajax_nopriv_custom_update_post', 'custom_update_post');
+
 
 function custom_meta_values() {
     $meta = array(
@@ -364,5 +424,60 @@ function view_revision_button($post_id, $file_id) {
         return '<div class="alert alert-dark" role="alert">
                             <b>No revisions</b>
                     </div>';
+    }
+}
+
+
+
+add_action('wp_insert_post', 'update_designrta_post_meta', 99);
+
+function update_designrta_post_meta($post_id) {
+    if (get_post_type($post_id) == 'project') {
+        $current_user = wp_get_current_user();
+        if (in_array('upstream_client_user', $current_user->roles)) {
+            update_post_meta($post_id, '_upstream_project_client_users', [get_current_user_id()]);
+            update_post_meta($post_id, '_upstream_project_client', get_client_id($current_user->data->display_name));
+            update_post_meta($post_id, '_upstream_project_status', 'gpaz9');
+            update_post_meta($post_id, '_upstream_project_start', time());
+            update_post_meta($post_id, '_upstream_project_end', (time() + (86400 * 2)));
+        }
+    }
+}
+
+function get_client_id($name) {
+    $client_id = null;
+    $client_objects = get_posts([
+        'post_type' => 'client',
+        's' => $name
+    ]);
+    if ($client_objects) {
+        $client_id = $client_objects[0]->ID;
+    }
+    return $client_id;
+}
+
+add_action('wp_insert_comment', 'update_post_meta_on_revison');
+
+function update_post_meta_on_revison($comment_id) {
+    $comment = get_comment($comment_id);
+    $post_id = $comment->comment_post_ID;
+    if (get_post_type($post_id) != 'project') return;
+    $current_user = wp_get_current_user();
+    if (in_array('upstream_client_user', $current_user->roles)) {
+        if ($comment->comment_parent) return;
+        update_post_meta(intval($post_id), '_upstream_project_status', 'cerwk');
+    }
+}
+
+function project_status_based_on_user($status_name) {
+    if ($status_name == 'Revision Requested') {
+        $current_user = wp_get_current_user();
+        if (in_array('upstream_client_user', $current_user->roles)) {
+            return 'In Revision';
+        } else {
+            return esc_html($status_name);
+        }
+    } else {
+        return esc_html($status_name);
     }
 }
